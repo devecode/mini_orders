@@ -114,6 +114,7 @@ Users can:
 | customer_email | string          |
 | total_amount   | decimal(10,2)   |
 | status         | string          |
+| description    | text nullable   |
 | external_data  | string nullable |
 | error_message  | text nullable   |
 | created_at     | timestamp       |
@@ -162,12 +163,6 @@ php artisan key:generate
 DB_CONNECTION=sqlite
 
 QUEUE_CONNECTION=database
-```
-
-Create the database:
-
-```sql
-CREATE DATABASE mini_orders;
 ```
 
 ---
@@ -306,7 +301,7 @@ Displays available commands.
 ### Create Order
 
 ```text
-/create_order Jessica|jessica@test.com|3000
+/create_order Jessica|jessica@test.com|3000|Pedido de prueba
 ```
 
 Example response:
@@ -318,6 +313,7 @@ ID: 5
 Customer: Jessica
 Email: jessica@test.com
 Amount: 3000
+Description: Pedido de prueba
 Status: pending
 ```
 
@@ -382,6 +378,7 @@ Response:
         "customer_name": "Ricardo Saucedo",
         "customer_email": "ricardo@test.com",
         "total_amount": 1500.5,
+        "description": "2 MacBooks Pro + 1 Monitor",
         "status": "pending"
     }
 }
