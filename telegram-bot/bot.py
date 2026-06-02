@@ -19,11 +19,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "Hola, soy el bot de pedidos.\n\n"
         "Comandos disponibles:\n"
-        "/create_order Nombre|email|monto\n"
+        "/create_order Nombre|email|monto|descripcion\n"
         "/orders\n"
         "/order ID\n\n"
         "Ejemplo:\n"
-        "/create_order Ricardo Saucedo|ricardo@test.com|1500.50"
+        "/create_order Jessica|jessica@test.com|3000|Pedido de prueba"
     )
 
 
@@ -34,28 +34,30 @@ async def create_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not text:
             await update.message.reply_text(
                 "Formato correcto:\n"
-                "/create_order Nombre|email|monto"
+                "/create_order Nombre|email|monto|descripcion"
             )
             return
 
         parts = text.split("|")
 
-        if len(parts) != 3:
+        if len(parts) != 4:
             await update.message.reply_text(
                 "Formato inválido.\n"
                 "Usa:\n"
-                "/create_order Nombre|email|monto"
+                "/create_order Nombre|email|monto|descripcion"
             )
             return
 
         customer_name = parts[0].strip()
         customer_email = parts[1].strip()
         total_amount = float(parts[2].strip())
+        description = parts[3].strip()
 
         payload = {
             "customer_name": customer_name,
             "customer_email": customer_email,
             "total_amount": total_amount,
+            "description": description,
         }
 
         response = requests.post(
@@ -83,6 +85,7 @@ async def create_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Cliente: {data.get('customer_name')}\n"
             f"Email: {data.get('customer_email')}\n"
             f"Monto: {data.get('total_amount')}\n"
+            f"Descripción: {data.get('description')}\n"
             f"Estado: {data.get('status')}\n\n"
             "El procesamiento se ejecutará en segundo plano."
         )
@@ -92,7 +95,6 @@ async def create_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         error_message = str(e)[:500]
         await update.message.reply_text(f"Error: {error_message}")
-
 
 async def list_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
@@ -123,6 +125,7 @@ async def list_orders(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 f"ID: {order.get('id')}\n"
                 f"Cliente: {order.get('customer_name')}\n"
                 f"Monto: {order.get('total_amount')}\n"
+                f"Descripción: {order.get('description')}\n"
                 f"Estado: {order.get('status')}\n"
                 f"External Data: {order.get('external_data')}\n"
                 "----------------------\n"
@@ -167,6 +170,7 @@ async def get_order(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"Cliente: {order.get('customer_name')}\n"
             f"Email: {order.get('customer_email')}\n"
             f"Monto: {order.get('total_amount')}\n"
+            f"Descripción: {order.get('description')}\n"
             f"Estado: {order.get('status')}\n"
             f"External Data: {order.get('external_data')}\n"
             f"Error: {order.get('error_message')}"

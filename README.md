@@ -158,15 +158,8 @@ php artisan key:generate
 
 ## Database Configuration
 
-Configure PostgreSQL in your `.env` file:
-
 ```env
-DB_CONNECTION=pgsql
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_DATABASE=mini_orders
-DB_USERNAME=postgres
-DB_PASSWORD=your_password
+DB_CONNECTION=sqlite
 
 QUEUE_CONNECTION=database
 ```
@@ -232,7 +225,7 @@ Telegram Bot (Python)
         ↓
 Laravel REST API
         ↓
-PostgreSQL
+SQLite
         ↓
 Queue Worker
         ↓
@@ -372,9 +365,10 @@ Request:
 
 ```json
 {
-    "customer_name": "Ricardo Saucedo",
-    "customer_email": "ricardo@test.com",
-    "total_amount": 1500.5
+    "customer_name": "Jessica",
+    "customer_email": "jessica@test.com",
+    "total_amount": 3000,
+    "description": "2 MacBooks Pro + 1 Monitor"
 }
 ```
 

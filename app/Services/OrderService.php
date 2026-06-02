@@ -14,6 +14,7 @@ class OrderService
             'customer_name' => $data['customer_name'],
             'customer_email' => $data['customer_email'],
             'total_amount' => $data['total_amount'],
+            'description' => $data['description'] ?? null,
             'status' => 'pending',
         ]);
 

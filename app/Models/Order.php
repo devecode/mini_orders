@@ -10,6 +10,7 @@ class Order extends Model
         'customer_name',
         'customer_email',
         'total_amount',
+        'description',
         'status',
         'external_data',
         'error_message',
