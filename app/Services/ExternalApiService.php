@@ -12,7 +12,7 @@ class ExternalApiService
             ->withHeaders([
                 'User-Agent' => 'Laravel Mini Orders'
             ])
-            ->get('https://api.github.com/zen');
+            ->get(config('services.external_api.url'));
 
         if ($response->failed()) {
             throw new \Exception('External API request failed.');

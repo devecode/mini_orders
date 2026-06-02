@@ -34,5 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-
+    'external_api' => [
+        'url' => env('EXTERNAL_API_URL', 'https://api.github.com/zen'),
+    ],
 ];

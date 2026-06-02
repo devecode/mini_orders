@@ -1,58 +1,510 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Mini Orders Service
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Overview
 
-## About Laravel
+Mini Orders Service is a Laravel-based backend application designed to manage customer orders through a REST API.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+The application allows users to:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Create new orders.
+- Process orders asynchronously using Laravel Queues.
+- Consume data from an external public API.
+- Store relevant external information in the order record.
+- Retrieve orders through REST endpoints.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The project was developed following Laravel best practices, emphasizing separation of concerns, dependency injection, service layers, and background job processing.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## Technology Stack
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- PHP 8+
+- Laravel 13
+- SQLite
+- Laravel Queue (Database Driver)
+- Composer
+- Python 3
+- python-telegram-bot
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## Architecture
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+The application follows a layered architecture:
 
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```text
+Controller
+    ↓
+Service Layer
+    ↓
+External API Service
+    ↓
+Queue Job
+    ↓
+Model / Database
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Components
 
-## Contributing
+#### OrderController
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Responsible for handling HTTP requests and responses.
 
-## Code of Conduct
+#### OrderService
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Contains the business logic related to order creation and processing.
 
-## Security Vulnerabilities
+#### ExternalApiService
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Encapsulates all communication with external APIs.
 
-## License
+#### ProcessOrderJob
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Processes orders asynchronously using Laravel Queues.
+
+#### Order Model
+
+Represents order records stored in the database.
+
+---
+
+## Features
+
+### Create Orders
+
+Creates a new order and dispatches a queue job for processing.
+
+### Process Orders in Background
+
+Each order is processed asynchronously.
+
+The processing flow:
+
+1. Retrieve order from database.
+2. Call external public API.
+3. Store relevant data from API response.
+4. Mark order as processed.
+5. If an error occurs, mark order as failed and log the error.
+
+### Retrieve Orders
+
+- List all orders.
+- Retrieve a specific order by ID.
+
+### Telegram Integration
+
+A Telegram bot was implemented as an additional interface for interacting with the Orders API.
+
+Users can:
+
+- Create orders from Telegram.
+- Retrieve orders.
+- View order details.
+
+---
+
+## Database Structure
+
+### orders
+
+| Column         | Type            |
+| -------------- | --------------- |
+| id             | bigint          |
+| customer_name  | string          |
+| customer_email | string          |
+| total_amount   | decimal(10,2)   |
+| status         | string          |
+| external_data  | string nullable |
+| error_message  | text nullable   |
+| created_at     | timestamp       |
+| updated_at     | timestamp       |
+
+### queue tables
+
+Laravel database queue tables are used to process background jobs.
+
+---
+
+## Installation
+
+### Clone Repository
+
+```bash
+git clone <repository-url>
+cd mini-orders-service
+```
+
+### Install Dependencies
+
+```bash
+composer install
+```
+
+### Environment Configuration
+
+Copy the environment file:
+
+```bash
+cp .env.example .env
+```
+
+Generate application key:
+
+```bash
+php artisan key:generate
+```
+
+---
+
+## Database Configuration
+
+Configure PostgreSQL in your `.env` file:
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=mini_orders
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+
+QUEUE_CONNECTION=database
+```
+
+Create the database:
+
+```sql
+CREATE DATABASE mini_orders;
+```
+
+---
+
+## Run Migrations
+
+```bash
+php artisan migrate
+```
+
+---
+
+## Start Application
+
+Start Laravel server:
+
+```bash
+php artisan serve
+```
+
+Application will be available at:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## Start Queue Worker
+
+In a separate terminal:
+
+```bash
+php artisan queue:work
+```
+
+This worker is responsible for processing order jobs in the background.
+
+---
+
+# Telegram Bot Integration
+
+As an additional feature, a Telegram Bot was implemented to interact with the Orders API.
+
+The bot communicates with the Laravel backend through REST API endpoints and allows users to:
+
+- Create new orders.
+- List existing orders.
+- Retrieve order details by ID.
+
+Architecture:
+
+```text
+Telegram Bot (Python)
+        ↓
+Laravel REST API
+        ↓
+PostgreSQL
+        ↓
+Queue Worker
+        ↓
+External API (GitHub Zen)
+```
+
+---
+
+## Telegram Bot Setup
+
+Navigate to the bot directory:
+
+```bash
+cd telegram-bot
+```
+
+Create virtual environment:
+
+```bash
+python3 -m venv venv
+```
+
+Activate virtual environment:
+
+### Mac/Linux
+
+```bash
+source venv/bin/activate
+```
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Telegram Bot Configuration
+
+Create a `.env` file inside the `telegram-bot` folder:
+
+```env
+TELEGRAM_BOT_TOKEN=your_bot_token
+LARAVEL_API_URL=http://127.0.0.1:8000/api
+```
+
+---
+
+## Running the Telegram Bot
+
+Start the bot:
+
+```bash
+python bot.py
+```
+
+---
+
+## Telegram Commands
+
+### Start Bot
+
+```text
+/start
+```
+
+Displays available commands.
+
+---
+
+### Create Order
+
+```text
+/create_order Jessica|jessica@test.com|3000
+```
+
+Example response:
+
+```text
+Order created successfully
+
+ID: 5
+Customer: Jessica
+Email: jessica@test.com
+Amount: 3000
+Status: pending
+```
+
+---
+
+### List Orders
+
+```text
+/orders
+```
+
+Returns the latest orders.
+
+---
+
+### Get Order Details
+
+```text
+/order 1
+```
+
+Returns detailed information for a specific order.
+
+---
+
+## Telegram Bot Link
+
+```text
+https://t.me/mini_orders_bot
+```
+
+---
+
+## API Endpoints
+
+### Create Order
+
+**POST**
+
+```http
+/api/orders
+```
+
+Request:
+
+```json
+{
+    "customer_name": "Ricardo Saucedo",
+    "customer_email": "ricardo@test.com",
+    "total_amount": 1500.5
+}
+```
+
+Response:
+
+```json
+{
+    "message": "Order created successfully",
+    "data": {
+        "id": 1,
+        "customer_name": "Ricardo Saucedo",
+        "customer_email": "ricardo@test.com",
+        "total_amount": 1500.5,
+        "status": "pending"
+    }
+}
+```
+
+---
+
+### List Orders
+
+**GET**
+
+```http
+/api/orders
+```
+
+Response:
+
+```json
+[
+    {
+        "id": 1,
+        "customer_name": "Ricardo Saucedo",
+        "customer_email": "ricardo@test.com",
+        "total_amount": 1500.5,
+        "status": "processed",
+        "external_data": "Avoid administrative distraction."
+    }
+]
+```
+
+---
+
+### Get Order Details
+
+**GET**
+
+```http
+/api/orders/{id}
+```
+
+Example:
+
+```http
+/api/orders/1
+```
+
+---
+
+## External API Integration
+
+The application integrates with:
+
+```text
+https://api.github.com/zen
+```
+
+The response text is stored in the `external_data` field of the order.
+
+Example:
+
+```text
+Avoid administrative distraction.
+```
+
+---
+
+## Error Handling
+
+If an external API request fails:
+
+- Order status is changed to `failed`.
+- Error message is stored in `error_message`.
+- Error details are logged using Laravel logging.
+
+Logs are available at:
+
+```text
+storage/logs/laravel.log
+```
+
+---
+
+## Example cURL Requests
+
+Create Order:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/orders \
+-H "Content-Type: application/json" \
+-H "Accept: application/json" \
+-d '{
+  "customer_name":"Ricardo Saucedo",
+  "customer_email":"ricardo@test.com",
+  "total_amount":1500.50
+}'
+```
+
+List Orders:
+
+```bash
+curl http://127.0.0.1:8000/api/orders
+```
+
+Get Order Details:
+
+```bash
+curl http://127.0.0.1:8000/api/orders/1
+```
+
+---
+
+## Design Decisions
+
+- Controllers remain lightweight.
+- Business logic is delegated to services.
+- External integrations are isolated.
+- Queue processing is handled through Jobs.
+- Dependency Injection is used throughout the application.
+- Laravel Resources are used to format API responses.
+- Form Requests are used for validation.
