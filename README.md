@@ -203,15 +203,25 @@ This worker is responsible for processing order jobs in the background.
 
 ---
 
+Sí. Yo actualizaría completamente la sección **Telegram Bot Integration** porque ya no refleja cómo funciona tu bot actualmente.
+
+Te propongo reemplazar desde **"Telegram Bot Integration"** hasta **"Telegram Commands"** por esto:
+
+---
+
 # Telegram Bot Integration
 
-As an additional feature, a Telegram Bot was implemented to interact with the Orders API.
+As an additional feature, a Telegram Bot was implemented to provide a user-friendly interface for interacting with the Orders API.
 
-The bot communicates with the Laravel backend through REST API endpoints and allows users to:
+Instead of requiring users to remember commands and parameters, the bot now offers an interactive menu with buttons and guided conversations.
 
-- Create new orders.
-- List existing orders.
-- Retrieve order details by ID.
+Users can:
+
+- Create orders through a step-by-step workflow.
+- View recent orders.
+- Retrieve detailed information about a specific order.
+- View statistics about orders.
+- Navigate through the application using Telegram buttons.
 
 Architecture:
 
@@ -225,6 +235,108 @@ SQLite
 Queue Worker
         ↓
 External API (GitHub Zen)
+```
+
+---
+
+## Telegram Bot Features
+
+### Interactive Main Menu
+
+When the user starts the bot, an interactive menu is displayed:
+
+```text
+👋 Hello, I am the Orders Bot
+
+What would you like to do?
+
+📝 Create Order
+📦 View Orders
+📊 Statistics
+```
+
+The user can navigate through the application without typing commands manually.
+
+---
+
+### Guided Order Creation
+
+Orders are created through a conversational workflow.
+
+Example:
+
+```text
+User: Create Order
+
+Bot: Enter customer name
+
+User: Jessica Smith
+
+Bot: Enter customer email
+
+User: jessica@test.com
+
+Bot: Enter order amount
+
+User: 3000
+
+Bot: Enter order description
+
+User: MacBook Pro Purchase
+
+Bot: Order created successfully
+```
+
+Benefits:
+
+- Better user experience.
+- Validation at each step.
+- No need to remember command formats.
+- Reduced input errors.
+
+---
+
+### Orders Dashboard
+
+The bot can display the latest orders in a user-friendly format.
+
+Example:
+
+```text
+📦 Latest Orders
+
+🆔 Order #12
+👤 Customer: Jessica Smith
+💰 Amount: $3,000
+📌 Status: processed
+
+━━━━━━━━━━━━━━
+
+🆔 Order #11
+👤 Customer: Ricardo Saucedo
+💰 Amount: $1,500
+📌 Status: pending
+```
+
+---
+
+### Order Statistics
+
+The bot provides basic statistics retrieved from the Orders API.
+
+Example:
+
+```text
+📊 Order Statistics
+
+📦 Total Orders: 25
+💰 Total Amount: $52,500.00
+
+📌 Orders by Status
+
+• pending: 8
+• processed: 15
+• failed: 2
 ```
 
 ---
@@ -278,8 +390,6 @@ LARAVEL_API_URL=http://127.0.0.1:8000/api
 
 ## Running the Telegram Bot
 
-Start the bot:
-
 ```bash
 python bot.py
 ```
@@ -294,7 +404,82 @@ python bot.py
 /start
 ```
 
-Displays available commands.
+Opens the interactive menu.
+
+---
+
+### Create Order
+
+```text
+/create_order
+```
+
+Starts the guided order creation process.
+
+---
+
+### List Orders
+
+```text
+/orders
+```
+
+Displays recent orders.
+
+---
+
+### Order Details
+
+```text
+/order {id}
+```
+
+Example:
+
+```text
+/order 15
+```
+
+Returns detailed information about the selected order.
+
+---
+
+### Statistics
+
+```text
+/stats
+```
+
+Displays order statistics.
+
+---
+
+### Cancel Current Operation
+
+```text
+/cancel
+```
+
+Cancels the current order creation process.
+
+---
+
+Además, en la sección **Features** del README agregaría esto:
+
+```md
+### Telegram Interactive Bot
+
+A Telegram Bot provides an additional interface to the application.
+
+Features include:
+
+- Interactive menu using Telegram buttons.
+- Guided order creation workflow.
+- Order listing.
+- Order detail retrieval.
+- Real-time statistics.
+- Conversation-based user experience.
+```
 
 ---
 
