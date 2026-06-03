@@ -1,38 +1,48 @@
-# Mini Orders Service
+Mini Orders Service
 
-## Overview
+Overview
 
 Mini Orders Service is a Laravel-based backend application designed to manage customer orders through a REST API.
 
 The application allows users to:
 
-- Create new orders.
-- Process orders asynchronously using Laravel Queues.
-- Consume data from an external public API.
-- Store relevant external information in the order record.
-- Retrieve orders through REST endpoints.
+* Create customer orders.
+* Process orders asynchronously using Laravel Queues.
+* Consume data from an external public API.
+* Store external API responses in the database.
+* Retrieve orders through REST endpoints.
+* Interact with the system through a Telegram Bot.
 
-The project was developed following Laravel best practices, emphasizing separation of concerns, dependency injection, service layers, and background job processing.
+The project was developed following Laravel best practices, emphasizing:
 
----
+* Separation of concerns
+* Service Layer architecture
+* Dependency Injection
+* Background Job Processing
+* API Resources
+* Form Request Validation
+* Automated Testing
 
-## Technology Stack
+⸻
 
-- PHP 8+
-- Laravel 13
-- SQLite
-- Laravel Queue (Database Driver)
-- Composer
-- Python 3
-- python-telegram-bot
+Technology Stack
 
----
+* PHP 8+
+* Laravel 13
+* SQLite
+* Laravel Queue (Database Driver)
+* Laravel Sanctum
+* Scribe (API Documentation)
+* PHPUnit
+* Python 3
+* python-telegram-bot
 
-## Architecture
+⸻
+
+Architecture
 
 The application follows a layered architecture:
 
-```text
 Controller
     ↓
 Service Layer
@@ -42,58 +52,162 @@ External API Service
 Queue Job
     ↓
 Model / Database
-```
 
-### Components
+Components
 
-#### OrderController
+OrderController
 
 Responsible for handling HTTP requests and responses.
 
-#### OrderService
+OrderService
 
-Contains the business logic related to order creation and processing.
+Contains the business logic related to order creation and order processing.
 
-#### ExternalApiService
+ExternalApiService
 
 Encapsulates all communication with external APIs.
 
-#### ProcessOrderJob
+ProcessOrderJob
 
 Processes orders asynchronously using Laravel Queues.
 
-#### Order Model
+Order Model
 
 Represents order records stored in the database.
 
----
+⸻
 
-## Features
+Features
 
-### Create Orders
+Orders Management
 
-Creates a new order and dispatches a queue job for processing.
+* Create orders
+* Retrieve all orders
+* Retrieve order details
+* Validate incoming requests
+* Store order descriptions
 
-### Process Orders in Background
+Background Processing
 
-Each order is processed asynchronously.
+Orders are processed asynchronously through Laravel Queues.
 
-The processing flow:
+Processing flow:
 
-1. Retrieve order from database.
-2. Call external public API.
-3. Store relevant data from API response.
-4. Mark order as processed.
-5. If an error occurs, mark order as failed and log the error.
+1. Create order
+2. Dispatch ProcessOrderJob
+3. Consume external API
+4. Store external data
+5. Update order status
+6. Handle failures and log errors
 
-### Retrieve Orders
+External API Integration
 
-- List all orders.
-- Retrieve a specific order by ID.
+The application integrates with an external API configured through Laravel services.
 
-## API Documentation
+Example:
 
-This project uses Scribe to generate API documentation automatically.
+https://api.github.com/zen
+
+Returned data is stored in the external_data field.
+
+API Documentation
+
+The project uses Scribe to automatically generate:
+
+* HTML Documentation
+* OpenAPI Specification
+* Postman Collection
+
+Documentation URLs:
+
+/docs
+/docs.postman
+/docs.openapi
+
+Automated Testing
+
+Feature tests cover:
+
+* Listing orders
+* Creating orders
+* Retrieving order details
+* Validation rules
+* 404 responses
+* Queue job dispatching
+
+Run tests:
+
+php artisan test
+
+⸻
+
+Database Structure
+
+orders
+
+Column	Type
+id	bigint
+customer_name	string
+customer_email	string
+total_amount	decimal(10,2)
+description	text nullable
+status	string
+external_data	text nullable
+error_message	text nullable
+created_at	timestamp
+updated_at	timestamp
+
+⸻
+
+Installation
+
+Clone Repository
+
+git clone <repository-url>
+cd mini-orders-service
+
+Install Dependencies
+
+composer install
+
+Environment Configuration
+
+cp .env.example .env
+php artisan key:generate
+
+Example configuration:
+
+DB_CONNECTION=sqlite
+QUEUE_CONNECTION=database
+EXTERNAL_API_URL=https://api.github.com/zen
+
+⸻
+
+Database Setup
+
+Run migrations:
+
+php artisan migrate
+
+⸻
+
+Running the Application
+
+Start Laravel server:
+
+php artisan serve
+
+Application URL:
+
+http://127.0.0.1:8000
+
+Start Queue Worker:
+
+php artisan queue:work
+
+⸻
+
+API Documentation Setup
 
 Install Scribe:
 
@@ -107,174 +221,79 @@ Generate documentation:
 
 php artisan scribe:generate
 
-View documentation:
+Open documentation:
 
 http://127.0.0.1:8000/docs
 
-Scribe also generates:
+⸻
 
-- HTML documentation
-- Postman collection
-- OpenAPI specification
+API Endpoints
 
-Available documentation routes:
+Create Order
 
-- /docs
-- /docs.postman
-- /docs.openapi
+POST
 
-## Running Tests
+/api/orders
 
-Run the automated test suite with:
+Request:
 
-```bash
-php artisan test
-```
+{
+    "customer_name": "Jessica",
+    "customer_email": "jessica@test.com",
+    "total_amount": 3000,
+    "description": "2 MacBooks Pro + 1 Monitor"
+}
 
-The project includes feature tests for:
+Response:
 
-Listing orders
-Creating orders
-Showing order details
-Validating required fields
-Handling not found orders
-Dispatching the order processing job
+{
+    "message": "Order created successfully",
+    "data": {
+        "id": 1,
+        "customer_name": "Jessica",
+        "customer_email": "jessica@test.com",
+        "total_amount": 3000,
+        "description": "2 MacBooks Pro + 1 Monitor",
+        "status": "pending"
+    }
+}
 
-## Telegram Integration
+⸻
 
-A Telegram bot was implemented as an additional interface for interacting with the Orders API.
+List Orders
 
-Users can:
+GET
 
-- Create orders from Telegram.
-- Retrieve orders.
-- View order details.
+/api/orders
 
----
+⸻
 
-## Database Structure
+Get Order Details
 
-### orders
+GET
 
-| Column         | Type            |
-| -------------- | --------------- |
-| id             | bigint          |
-| customer_name  | string          |
-| customer_email | string          |
-| total_amount   | decimal(10,2)   |
-| status         | string          |
-| description    | text nullable   |
-| external_data  | string nullable |
-| error_message  | text nullable   |
-| created_at     | timestamp       |
-| updated_at     | timestamp       |
+/api/orders/{id}
 
-### queue tables
+Example:
 
-Laravel database queue tables are used to process background jobs.
+/api/orders/1
 
----
+⸻
 
-## Installation
+Telegram Bot
 
-### Clone Repository
+The project includes a Telegram Bot that acts as an additional interface to the Orders API.
 
-```bash
-git clone <repository-url>
-cd mini-orders-service
-```
+Features:
 
-### Install Dependencies
-
-```bash
-composer install
-```
-
-### Environment Configuration
-
-Copy the environment file:
-
-```bash
-cp .env.example .env
-```
-
-Generate application key:
-
-```bash
-php artisan key:generate
-```
-
----
-
-## Database Configuration
-
-```env
-DB_CONNECTION=sqlite
-
-QUEUE_CONNECTION=database
-```
-
----
-
-## Run Migrations
-
-```bash
-php artisan migrate
-```
-
----
-
-## Start Application
-
-Start Laravel server:
-
-```bash
-php artisan serve
-```
-
-Application will be available at:
-
-```text
-http://127.0.0.1:8000
-```
-
----
-
-## Start Queue Worker
-
-In a separate terminal:
-
-```bash
-php artisan queue:work
-```
-
-This worker is responsible for processing order jobs in the background.
-
----
-
-Sí. Yo actualizaría completamente la sección **Telegram Bot Integration** porque ya no refleja cómo funciona tu bot actualmente.
-
-Te propongo reemplazar desde **"Telegram Bot Integration"** hasta **"Telegram Commands"** por esto:
-
----
-
-# Telegram Bot Integration
-
-As an additional feature, a Telegram Bot was implemented to provide a user-friendly interface for interacting with the Orders API.
-
-Instead of requiring users to remember commands and parameters, the bot now offers an interactive menu with buttons and guided conversations.
-
-Users can:
-
-- Create orders through a step-by-step workflow.
-- View recent orders.
-- Retrieve detailed information about a specific order.
-- View statistics about orders.
-- Navigate through the application using Telegram buttons.
+* Interactive menu
+* Guided order creation
+* Order listing
+* Order details
+* Statistics dashboard
 
 Architecture:
 
-```text
 Telegram Bot (Python)
         ↓
 Laravel REST API
@@ -283,452 +302,41 @@ SQLite
         ↓
 Queue Worker
         ↓
-External API (GitHub Zen)
-```
+External API
 
----
+Bot Configuration
 
-## Telegram Bot Features
-
-### Interactive Main Menu
-
-When the user starts the bot, an interactive menu is displayed:
-
-```text
-👋 Hello, I am the Orders Bot
-
-What would you like to do?
-
-📝 Create Order
-📦 View Orders
-📊 Statistics
-```
-
-The user can navigate through the application without typing commands manually.
-
----
-
-### Guided Order Creation
-
-Orders are created through a conversational workflow.
-
-Example:
-
-```text
-User: Create Order
-
-Bot: Enter customer name
-
-User: Jessica Smith
-
-Bot: Enter customer email
-
-User: jessica@test.com
-
-Bot: Enter order amount
-
-User: 3000
-
-Bot: Enter order description
-
-User: MacBook Pro Purchase
-
-Bot: Order created successfully
-```
-
-Benefits:
-
-- Better user experience.
-- Validation at each step.
-- No need to remember command formats.
-- Reduced input errors.
-
----
-
-### Orders Dashboard
-
-The bot can display the latest orders in a user-friendly format.
-
-Example:
-
-```text
-📦 Latest Orders
-
-🆔 Order #12
-👤 Customer: Jessica Smith
-💰 Amount: $3,000
-📌 Status: processed
-
-━━━━━━━━━━━━━━
-
-🆔 Order #11
-👤 Customer: Ricardo Saucedo
-💰 Amount: $1,500
-📌 Status: pending
-```
-
----
-
-### Order Statistics
-
-The bot provides basic statistics retrieved from the Orders API.
-
-Example:
-
-```text
-📊 Order Statistics
-
-📦 Total Orders: 25
-💰 Total Amount: $52,500.00
-
-📌 Orders by Status
-
-• pending: 8
-• processed: 15
-• failed: 2
-```
-
----
-
-## Telegram Bot Setup
-
-Navigate to the bot directory:
-
-```bash
-cd telegram-bot
-```
-
-Create virtual environment:
-
-```bash
-python3 -m venv venv
-```
-
-Activate virtual environment:
-
-### Mac/Linux
-
-```bash
-source venv/bin/activate
-```
-
-### Windows
-
-```bash
-venv\Scripts\activate
-```
-
-Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## Telegram Bot Configuration
-
-Create a `.env` file inside the `telegram-bot` folder:
-
-```env
 TELEGRAM_BOT_TOKEN=your_bot_token
 LARAVEL_API_URL=http://127.0.0.1:8000/api
-```
 
----
+Run Bot
 
-## Running the Telegram Bot
-
-```bash
 python bot.py
-```
 
----
+⸻
 
-## Telegram Commands
+Error Handling
 
-### Start Bot
+If the external API request fails:
 
-```text
-/start
-```
+* Order status becomes failed
+* Error message is stored in error_message
+* Error is logged in Laravel logs
 
-Opens the interactive menu.
+Log file:
 
----
-
-### Create Order
-
-```text
-/create_order
-```
-
-Starts the guided order creation process.
-
----
-
-### List Orders
-
-```text
-/orders
-```
-
-Displays recent orders.
-
----
-
-### Order Details
-
-```text
-/order {id}
-```
-
-Example:
-
-```text
-/order 15
-```
-
-Returns detailed information about the selected order.
-
----
-
-### Statistics
-
-```text
-/stats
-```
-
-Displays order statistics.
-
----
-
-### Cancel Current Operation
-
-```text
-/cancel
-```
-
-Cancels the current order creation process.
-
----
-
-
-```md
-### Telegram Interactive Bot
-
-A Telegram Bot provides an additional interface to the application.
-
-Features include:
-
-- Interactive menu using Telegram buttons.
-- Guided order creation workflow.
-- Order listing.
-- Order detail retrieval.
-- Real-time statistics.
-- Conversation-based user experience.
-```
-
----
-
-### Create Order
-
-```text
-/create_order Jessica|jessica@test.com|3000|Pedido de prueba
-```
-
-Example response:
-
-```text
-Order created successfully
-
-ID: 5
-Customer: Jessica
-Email: jessica@test.com
-Amount: 3000
-Description: Pedido de prueba
-Status: pending
-```
-
----
-
-### List Orders
-
-```text
-/orders
-```
-
-Returns the latest orders.
-
----
-
-### Get Order Details
-
-```text
-/order 1
-```
-
-Returns detailed information for a specific order.
-
----
-
-## Telegram Bot Link
-
-```text
-https://t.me/mini_orders_bot
-```
-
----
-
-## API Endpoints
-
-### Create Order
-
-**POST**
-
-```http
-/api/orders
-```
-
-Request:
-
-```json
-{
-    "customer_name": "Jessica",
-    "customer_email": "jessica@test.com",
-    "total_amount": 3000,
-    "description": "2 MacBooks Pro + 1 Monitor"
-}
-```
-
-Response:
-
-```json
-{
-    "message": "Order created successfully",
-    "data": {
-        "id": 1,
-        "customer_name": "Ricardo Saucedo",
-        "customer_email": "ricardo@test.com",
-        "total_amount": 1500.5,
-        "description": "2 MacBooks Pro + 1 Monitor",
-        "status": "pending"
-    }
-}
-```
-
----
-
-### List Orders
-
-**GET**
-
-```http
-/api/orders
-```
-
-Response:
-
-```json
-[
-    {
-        "id": 1,
-        "customer_name": "Ricardo Saucedo",
-        "customer_email": "ricardo@test.com",
-        "total_amount": 1500.5,
-        "status": "processed",
-        "external_data": "Avoid administrative distraction."
-    }
-]
-```
-
----
-
-### Get Order Details
-
-**GET**
-
-```http
-/api/orders/{id}
-```
-
-Example:
-
-```http
-/api/orders/1
-```
-
----
-
-## External API Integration
-
-The application integrates with:
-
-```text
-https://api.github.com/zen
-```
-
-The response text is stored in the `external_data` field of the order.
-
-Example:
-
-```text
-Avoid administrative distraction.
-```
-
----
-
-## Error Handling
-
-If an external API request fails:
-
-- Order status is changed to `failed`.
-- Error message is stored in `error_message`.
-- Error details are logged using Laravel logging.
-
-Logs are available at:
-
-```text
 storage/logs/laravel.log
-```
 
----
+⸻
 
-## Example cURL Requests
+Design Decisions
 
-Create Order:
-
-```bash
-curl -X POST http://127.0.0.1:8000/api/orders \
--H "Content-Type: application/json" \
--H "Accept: application/json" \
--d '{
-  "customer_name":"Ricardo Saucedo",
-  "customer_email":"ricardo@test.com",
-  "total_amount":1500.50
-}'
-```
-
-List Orders:
-
-```bash
-curl http://127.0.0.1:8000/api/orders
-```
-
-Get Order Details:
-
-```bash
-curl http://127.0.0.1:8000/api/orders/1
-```
-
----
-
-## Design Decisions
-
-- Controllers remain lightweight.
-- Business logic is delegated to services.
-- External integrations are isolated.
-- Queue processing is handled through Jobs.
-- Dependency Injection is used throughout the application.
-- Laravel Resources are used to format API responses.
-- Form Requests are used for validation.
+* Controllers remain lightweight.
+* Business logic is delegated to services.
+* External integrations are isolated.
+* Queue processing is handled through Jobs.
+* Dependency Injection is used throughout the application.
+* Laravel Resources format API responses.
+* Form Requests handle validation.
+* Feature Tests validate API behavior.
+* Scribe generates API documentation automatically.
