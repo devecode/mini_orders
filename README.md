@@ -91,6 +91,38 @@ The processing flow:
 - List all orders.
 - Retrieve a specific order by ID.
 
+## API Documentation
+
+This project uses Scribe to generate API documentation automatically.
+
+Install Scribe:
+
+composer require --dev knuckleswtf/scribe
+
+Publish configuration:
+
+php artisan vendor:publish --tag=scribe-config
+
+Generate documentation:
+
+php artisan scribe:generate
+
+View documentation:
+
+http://127.0.0.1:8000/docs
+
+Scribe also generates:
+
+- HTML documentation
+- Postman collection
+- OpenAPI specification
+
+Available documentation routes:
+
+- /docs
+- /docs.postman
+- /docs.openapi
+
 ### Telegram Integration
 
 A Telegram bot was implemented as an additional interface for interacting with the Orders API.
