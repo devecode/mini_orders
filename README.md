@@ -129,6 +129,7 @@ Run the automated test suite with:
 
 ```bash
 php artisan test
+```
 
 The project includes feature tests for:
 
@@ -138,8 +139,6 @@ Showing order details
 Validating required fields
 Handling not found orders
 Dispatching the order processing job
-
-```
 
 ### Telegram Integration
 
