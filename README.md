@@ -513,7 +513,6 @@ Cancels the current order creation process.
 
 ---
 
-Además, en la sección **Features** del README agregaría esto:
 
 ```md
 ### Telegram Interactive Bot
