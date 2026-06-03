@@ -123,6 +123,24 @@ Available documentation routes:
 - /docs.postman
 - /docs.openapi
 
+## Running Tests
+
+Run the automated test suite with:
+
+```bash
+php artisan test
+
+The project includes feature tests for:
+
+Listing orders
+Creating orders
+Showing order details
+Validating required fields
+Handling not found orders
+Dispatching the order processing job
+
+```
+
 ### Telegram Integration
 
 A Telegram bot was implemented as an additional interface for interacting with the Orders API.
