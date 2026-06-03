@@ -140,7 +140,7 @@ Validating required fields
 Handling not found orders
 Dispatching the order processing job
 
-### Telegram Integration
+## Telegram Integration
 
 A Telegram bot was implemented as an additional interface for interacting with the Orders API.
 
