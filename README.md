@@ -1,4 +1,4 @@
-Mini Orders Service
+# Mini Orders Service
 
 Overview
 
@@ -25,7 +25,7 @@ The project was developed following Laravel best practices, emphasizing:
 
 ⸻
 
-Technology Stack
+## Technology Stack
 
 * PHP 8+
 * Laravel 13
@@ -39,7 +39,7 @@ Technology Stack
 
 ⸻
 
-Architecture
+## Architecture
 
 The application follows a layered architecture:
 
@@ -77,7 +77,7 @@ Represents order records stored in the database.
 
 ⸻
 
-Features
+## Features
 
 Orders Management
 
@@ -100,7 +100,7 @@ Processing flow:
 5. Update order status
 6. Handle failures and log errors
 
-External API Integration
+## External API Integration
 
 The application integrates with an external API configured through Laravel services.
 
@@ -110,7 +110,7 @@ https://api.github.com/zen
 
 Returned data is stored in the external_data field.
 
-API Documentation
+## API Documentation
 
 The project uses Scribe to automatically generate:
 
@@ -141,7 +141,7 @@ php artisan test
 
 ⸻
 
-Database Structure
+## Database Structure
 
 orders
 
@@ -159,7 +159,7 @@ updated_at	timestamp
 
 ⸻
 
-Installation
+## Installation
 
 Clone Repository
 
@@ -183,7 +183,7 @@ EXTERNAL_API_URL=https://api.github.com/zen
 
 ⸻
 
-Database Setup
+## Database Setup
 
 Run migrations:
 
@@ -191,7 +191,7 @@ php artisan migrate
 
 ⸻
 
-Running the Application
+## Running the Application
 
 Start Laravel server:
 
@@ -207,7 +207,7 @@ php artisan queue:work
 
 ⸻
 
-API Documentation Setup
+## API Documentation Setup
 
 Install Scribe:
 
@@ -227,7 +227,7 @@ http://127.0.0.1:8000/docs
 
 ⸻
 
-API Endpoints
+## API Endpoints
 
 Create Order
 
@@ -280,7 +280,7 @@ Example:
 
 ⸻
 
-Telegram Bot
+## Telegram Bot
 
 The project includes a Telegram Bot that acts as an additional interface to the Orders API.
 
