@@ -1,48 +1,56 @@
 # Mini Orders Service
 
-Overview
+A Laravel-based REST API for managing customer orders asynchronously, with external API integration and a Telegram Bot interface.
 
-Mini Orders Service is a Laravel-based backend application designed to manage customer orders through a REST API.
+-----
 
-The application allows users to:
+## Table of Contents
 
-* Create customer orders.
-* Process orders asynchronously using Laravel Queues.
-* Consume data from an external public API.
-* Store external API responses in the database.
-* Retrieve orders through REST endpoints.
-* Interact with the system through a Telegram Bot.
+- [Overview](#overview)
+- [Tech Stack](#tech-stack)
+- [Architecture](#architecture)
+- [Features](#features)
+- [Database Schema](#database-schema)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
+- [API Endpoints](#api-endpoints)
+- [Telegram Bot](#telegram-bot)
+- [Testing](#testing)
+- [API Documentation](#api-documentation)
+- [Error Handling](#error-handling)
 
-The project was developed following Laravel best practices, emphasizing:
+-----
 
-* Separation of concerns
-* Service Layer architecture
-* Dependency Injection
-* Background Job Processing
-* API Resources
-* Form Request Validation
-* Automated Testing
+## Overview
 
-⸻
+Mini Orders Service allows you to:
 
-## Technology Stack
+- Create and retrieve customer orders via REST endpoints
+- Process orders asynchronously using Laravel Queues
+- Consume data from an external public API and store the response
+- Interact with the system through a Telegram Bot
 
-* PHP 8+
-* Laravel 13
-* SQLite
-* Laravel Queue (Database Driver)
-* Laravel Sanctum
-* Scribe (API Documentation)
-* PHPUnit
-* Python 3
-* python-telegram-bot
+The project follows Laravel best practices: **Service Layer**, **Dependency Injection**, **API Resources**, **Form Request Validation**, and **Feature Testing**.
 
-⸻
+-----
+
+## Tech Stack
+
+|Layer       |Technology                   |
+|------------|-----------------------------|
+|Backend     |PHP 8+, Laravel 13           |
+|Database    |SQLite                       |
+|Queue Driver|Laravel Queue (Database)     |
+|Auth        |Laravel Sanctum              |
+|API Docs    |Scribe                       |
+|Testing     |PHPUnit                      |
+|Bot         |Python 3, python-telegram-bot|
+
+-----
 
 ## Architecture
 
-The application follows a layered architecture:
-
+```
 Controller
     ↓
 Service Layer
@@ -52,200 +60,143 @@ External API Service
 Queue Job
     ↓
 Model / Database
+```
 
-Components
+**Components:**
 
-OrderController
+- **`OrderController`** — Handles HTTP requests and responses
+- **`OrderService`** — Contains business logic for order creation and processing
+- **`ExternalApiService`** — Encapsulates communication with external APIs
+- **`ProcessOrderJob`** — Processes orders asynchronously via Laravel Queues
+- **`Order`** — Eloquent model representing order records
 
-Responsible for handling HTTP requests and responses.
-
-OrderService
-
-Contains the business logic related to order creation and order processing.
-
-ExternalApiService
-
-Encapsulates all communication with external APIs.
-
-ProcessOrderJob
-
-Processes orders asynchronously using Laravel Queues.
-
-Order Model
-
-Represents order records stored in the database.
-
-⸻
+-----
 
 ## Features
 
-Orders Management
+### Orders Management
 
-* Create orders
-* Retrieve all orders
-* Retrieve order details
-* Validate incoming requests
-* Store order descriptions
+- Create, list, and retrieve orders
+- Input validation via Form Requests
+- Responses formatted with API Resources
 
-Background Processing
+### Background Processing
 
-Orders are processed asynchronously through Laravel Queues.
+Orders are processed asynchronously through the following flow:
 
-Processing flow:
-
+```
 1. Create order
 2. Dispatch ProcessOrderJob
-3. Consume external API
-4. Store external data
+3. Consume external API  →  https://api.github.com/zen
+4. Store external data in external_data field
 5. Update order status
 6. Handle failures and log errors
+```
 
-## External API Integration
+### External API Integration
 
-The application integrates with an external API configured through Laravel services.
+The application consumes a configurable external API (default: `https://api.github.com/zen`) and stores the response in the `external_data` column.
 
-Example:
+-----
 
-https://api.github.com/zen
+## Database Schema
 
-Returned data is stored in the external_data field.
+### `orders`
 
-## API Documentation
+|Column          |Type           |
+|----------------|---------------|
+|`id`            |bigint         |
+|`customer_name` |string         |
+|`customer_email`|string         |
+|`total_amount`  |decimal(10,2)  |
+|`description`   |text (nullable)|
+|`status`        |string         |
+|`external_data` |text (nullable)|
+|`error_message` |text (nullable)|
+|`created_at`    |timestamp      |
+|`updated_at`    |timestamp      |
 
-The project uses Scribe to automatically generate:
-
-* HTML Documentation
-* OpenAPI Specification
-* Postman Collection
-
-Documentation URLs:
-
-/docs
-/docs.postman
-/docs.openapi
-
-Automated Testing
-
-Feature tests cover:
-
-* Listing orders
-* Creating orders
-* Retrieving order details
-* Validation rules
-* 404 responses
-* Queue job dispatching
-
-Run tests:
-
-php artisan test
-
-⸻
-
-## Database Structure
-
-orders
-
-Column	Type
-id	bigint
-customer_name	string
-customer_email	string
-total_amount	decimal(10,2)
-description	text nullable
-status	string
-external_data	text nullable
-error_message	text nullable
-created_at	timestamp
-updated_at	timestamp
-
-⸻
+-----
 
 ## Installation
 
-Clone Repository
+### 1. Clone the repository
 
+```bash
 git clone <repository-url>
 cd mini-orders-service
+```
 
-Install Dependencies
+### 2. Install dependencies
 
+```bash
 composer install
+```
 
-Environment Configuration
+### 3. Configure environment
 
+```bash
 cp .env.example .env
 php artisan key:generate
+```
 
-Example configuration:
+Update `.env` with:
 
+```env
 DB_CONNECTION=sqlite
 QUEUE_CONNECTION=database
 EXTERNAL_API_URL=https://api.github.com/zen
+```
 
-⸻
+### 4. Run migrations
 
-## Database Setup
-
-Run migrations:
-
+```bash
 php artisan migrate
+```
 
-⸻
+-----
 
 ## Running the Application
 
-Start Laravel server:
+### Start the development server
 
+```bash
 php artisan serve
+# → http://127.0.0.1:8000
+```
 
-Application URL:
+### Start the queue worker
 
-http://127.0.0.1:8000
-
-Start Queue Worker:
-
+```bash
 php artisan queue:work
+```
 
-⸻
+> Both processes must be running for orders to be processed correctly.
 
-## API Documentation Setup
-
-Install Scribe:
-
-composer require --dev knuckleswtf/scribe
-
-Publish configuration:
-
-php artisan vendor:publish --tag=scribe-config
-
-Generate documentation:
-
-php artisan scribe:generate
-
-Open documentation:
-
-http://127.0.0.1:8000/docs
-
-⸻
+-----
 
 ## API Endpoints
 
-Create Order
+### Create Order
 
-POST
+```
+POST /api/orders
+```
 
-/api/orders
+**Request body:**
 
-Request:
-
+```json
 {
     "customer_name": "Jessica",
     "customer_email": "jessica@test.com",
     "total_amount": 3000,
     "description": "2 MacBooks Pro + 1 Monitor"
 }
+```
 
-Response:
+**Response `201`:**
 
+```json
 {
     "message": "Order created successfully",
     "data": {
@@ -257,86 +208,118 @@ Response:
         "status": "pending"
     }
 }
+```
 
-⸻
+-----
 
-List Orders
+### List Orders
 
-GET
+```
+GET /api/orders
+```
 
-/api/orders
+-----
 
-⸻
+### Get Order Details
 
-Get Order Details
+```
+GET /api/orders/{id}
+```
 
-GET
+**Example:** `GET /api/orders/1`
 
-/api/orders/{id}
-
-Example:
-
-/api/orders/1
-
-⸻
+-----
 
 ## Telegram Bot
 
-The project includes a Telegram Bot that acts as an additional interface to the Orders API.
+An interactive Telegram Bot acts as an additional interface to the API.
 
-Features:
+### Features
 
-* Interactive menu
-* Guided order creation
-* Order listing
-* Order details
-* Statistics dashboard
+- Interactive menu for guided navigation
+- Create orders step by step
+- List and view order details
+- Statistics dashboard
 
-Architecture:
+### Architecture
 
+```
 Telegram Bot (Python)
         ↓
 Laravel REST API
         ↓
-SQLite
-        ↓
-Queue Worker
+SQLite + Queue Worker
         ↓
 External API
+```
 
-Bot Configuration
+### Configuration
 
+Add to your `.env` (or bot config):
+
+```env
 TELEGRAM_BOT_TOKEN=your_bot_token
 LARAVEL_API_URL=http://127.0.0.1:8000/api
+```
 
-Run Bot
+### Run the bot
 
+```bash
 python bot.py
+```
 
-⸻
+-----
 
-Error Handling
+## Testing
 
-If the external API request fails:
+Feature tests cover: listing orders, creating orders, order details, validation rules, 404 responses, and queue job dispatching.
 
-* Order status becomes failed
-* Error message is stored in error_message
-* Error is logged in Laravel logs
+```bash
+php artisan test
+```
 
-Log file:
+-----
 
-storage/logs/laravel.log
+## API Documentation
 
-⸻
+The project uses [Scribe](https://scribe.knuckles.wtf/) to auto-generate documentation.
 
-Design Decisions
+### Setup
 
-* Controllers remain lightweight.
-* Business logic is delegated to services.
-* External integrations are isolated.
-* Queue processing is handled through Jobs.
-* Dependency Injection is used throughout the application.
-* Laravel Resources format API responses.
-* Form Requests handle validation.
-* Feature Tests validate API behavior.
-* Scribe generates API documentation automatically.
+```bash
+composer require --dev knuckleswtf/scribe
+php artisan vendor:publish --tag=scribe-config
+php artisan scribe:generate
+```
+
+### Documentation URLs
+
+|Format            |URL            |
+|------------------|---------------|
+|HTML              |`/docs`        |
+|OpenAPI           |`/docs.openapi`|
+|Postman Collection|`/docs.postman`|
+
+-----
+
+## Error Handling
+
+If the external API call fails during job processing:
+
+- Order `status` is set to `failed`
+- The error message is stored in `error_message`
+- The error is logged in `storage/logs/laravel.log`
+
+-----
+
+## Design Decisions
+
+- Controllers are kept **thin** — no business logic
+- Business logic lives in **Service classes**
+- External integrations are **isolated** in their own service
+- Queue processing is handled through **dedicated Jobs**
+- **Dependency Injection** is used throughout
+- **Laravel Resources** format all API responses
+- **Form Requests** handle input validation
+- **Feature Tests** validate end-to-end API behavior
+- **Scribe** generates API documentation automatically
